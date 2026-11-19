@@ -1,0 +1,55 @@
+name: Публикация «Сметы» на GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Получить файлы
+        uses: actions/checkout@v4
+      - name: Установить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Установить зависимости
+        run: npm install --no-audit --no-fund
+      - name: Проверить ключи Supabase
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          test -n "$VITE_SUPABASE_URL" || { echo "Отсутствует VITE_SUPABASE_URL в GitHub Secrets"; exit 1; }
+          test -n "$VITE_SUPABASE_ANON_KEY" || { echo "Отсутствует VITE_SUPABASE_ANON_KEY в GitHub Secrets"; exit 1; }
+          case "$VITE_SUPABASE_ANON_KEY" in
+            sb_secret_*) echo "Нельзя использовать секретный ключ sb_secret"; exit 1 ;;
+          esac
+      - name: Собрать сайт
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+      - name: Настроить GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Загрузить файлы сайта
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Опубликовать сайт
+        id: deployment
+        uses: actions/deploy-pages@v4
