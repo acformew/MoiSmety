@@ -180,3 +180,6 @@ input[type="date"] { min-width: 0; }
   .print-signatures span { white-space: nowrap; }
   .print-footer { margin-top: 25px; color: #74827f; font-size: 7px; text-align: center; }
 }
+
+body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+@media (pointer: coarse) { .table-input, .icon-button { min-height: 44px; } }
