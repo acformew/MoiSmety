@@ -51,6 +51,25 @@ test("offline estimates, persistent restart, account isolation, snapshot reports
   await page
     .getByRole("button", { name: "Создать отчёт", exact: true })
     .click();
+  const photo = await page.evaluate(() => {
+    const c = document.createElement("canvas");
+    c.width = 8;
+    c.height = 8;
+    const context = c.getContext("2d")!;
+    context.fillStyle = "#087e68";
+    context.fillRect(0, 0, 8, 8);
+    return c.toDataURL("image/png").split(",")[1];
+  });
+  await page
+    .locator('input[type="file"]')
+    .setInputFiles({
+      name: "работа.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(photo, "base64"),
+    });
+  await expect(
+    page.getByRole("img", { name: "Фото выполненных работ" }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Сформировать документ", exact: true })
     .click();
