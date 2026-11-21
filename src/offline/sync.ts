@@ -42,12 +42,20 @@ export async function syncAccount(
         operation_id: state.inflight.id,
         changes: state.inflight.changes,
       });
-      if (error)
+      if (error) {
+        // A database validation error confirms rollback. Rebuild the next batch
+        // from durable edits so corrected input can be submitted.
+        if (/^(22|23|42|P0|PGRST)/.test(error.code ?? "")) {
+          publish(
+            await editState(user, (s) => ({ data: s.data, base: s.base })),
+          );
+        }
         throw Error(
           error.code === "40001"
             ? "Конфликт изменений. Выберите способ разрешения."
             : error.message,
         );
+      }
       publish(
         await editState(user, (s) =>
           acknowledge(s, validateSnapshot(data, user)),

@@ -28,9 +28,10 @@ export function reportLines(
       kind === "progress"
         ? completed * Number(item.unit_price)
         : entries.reduce(
-            (sum, e) => sum + Math.round(e.delta * e.unit_price * 100) / 100,
+            (sum, e) =>
+              sum + Math.round(e.delta * 1000) * Math.round(e.unit_price * 100),
             0,
-          );
+          ) / 100000;
     return {
       id: item.id,
       name: item.name,

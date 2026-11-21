@@ -130,3 +130,34 @@ describe("period history", () => {
     ).toThrow();
   });
 });
+it("fully reversed fractional work has zero quantity and zero cost", () => {
+  const item = {
+    ...row,
+    estimate_id: "estimate",
+    position: 0,
+    unit_price: 1,
+    planned_qty: 1,
+    completed_qty: 0,
+    note: "",
+    custom_values: {},
+  };
+  const event = {
+    id: "first",
+    user_id: "one",
+    estimate_id: "estimate",
+    item_id: "work",
+    date: "2026-02-01",
+    delta: 0.005,
+    unit_price: 1,
+    created_at: "",
+  };
+  const result = reportLines(
+    [item],
+    [event, { ...event, id: "correction", delta: -0.005 }],
+    "period",
+    "2026-02-01",
+    "2026-02-01",
+  );
+  expect(result.lines[0].completed).toBe(0);
+  expect(result.lines[0].amount).toBe(0);
+});

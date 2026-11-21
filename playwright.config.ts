@@ -6,7 +6,9 @@ export default defineConfig({
     browserName: "chromium",
     headless: true,
     launchOptions: {
-      executablePath: existsSync("/usr/bin/chromium") ? "/usr/bin/chromium" : undefined,
+      executablePath: existsSync("/usr/bin/chromium")
+        ? "/usr/bin/chromium"
+        : undefined,
       args: ["--no-sandbox"],
     },
   },

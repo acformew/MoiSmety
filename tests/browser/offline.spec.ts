@@ -20,7 +20,9 @@ test("offline estimates, persistent restart, account isolation, snapshot reports
       );
     }
   });
-  await context.route("https://test.supabase.co/**", (route) => route.abort());
+  await context.route(/^https:\/\/[^/]+\.supabase\.co\//, (route) =>
+    route.abort(),
+  );
   await page.goto("http://127.0.0.1:5173");
   await page.getByRole("button", { name: "Загрузить пример" }).click();
   await expect(

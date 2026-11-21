@@ -31,6 +31,8 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon --max-workers=2
