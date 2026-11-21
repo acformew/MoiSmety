@@ -1,17 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
+import { validPublicConfig } from './publicConfig';
+import { authStorage } from '../offline/storage';
 
-const url = import.meta.env.VITE_SUPABASE_URL?.trim() ?? '';
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() ?? '';
+const url = import.meta.env.VITE_SUPABASE_URL?.trim() || localStorage.getItem('moismety-url') || '';
+const key = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || localStorage.getItem('moismety-key') || '';
 
-export const isConfigured =
-  url.startsWith('https://') &&
-  url.includes('.supabase.co') &&
-  key.length >= 20 &&
-  !url.includes('YOUR_PROJECT');
+export const isConfigured = validPublicConfig(url,key);
 
 export const supabase = isConfigured
   ? createClient(url, key, {
       auth: {
+        storage: authStorage,
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
