@@ -134,4 +134,5 @@ begin
  return new;
 end $$;
 create trigger moismety_capture_completion after update of completed_qty on public.estimate_items for each row execute function public.moismety_capture_legacy_completion();
+notify pgrst, 'reload schema';
 commit;
